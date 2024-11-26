@@ -10,6 +10,8 @@ import {
 } from "fastify-type-provider-zod";
 
 import { routes } from "@/routes";
+import { writeFile } from "fs/promises";
+import { resolve } from "node:path";
 
 const app = fastify().withTypeProvider<ZodTypeProvider>();
 
@@ -46,4 +48,14 @@ app.register(routes);
 
 app.listen({ port: 3333 }).then(() => {
   console.log("Server is running on port 3333");
+});
+
+app.ready().then(() => {
+  const spec = app.swagger();
+
+  writeFile(
+    resolve(__dirname, "swagger.json"),
+    JSON.stringify(spec, null, 2),
+    "utf-8"
+  );
 });
